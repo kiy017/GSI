@@ -94,6 +94,6 @@ jobs:
           GOFILE_API_KEY: ${{ secrets.GOFILE_API_KEY }}
         run: |
           FILE=$(ls Output/*.img* | head -n 1)
-          bash upload.sh "$FILE"
+          bash uploadgofile.sh "$FILE"
         
           

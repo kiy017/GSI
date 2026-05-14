@@ -103,19 +103,39 @@ echo "Converting to PHH layout..."
 
 mkdir -p "$BASE_DIR/system"
 
-# Move product into /system/system/product
+# PRODUCT
 if [ -d "$BASE_DIR/product" ] && [ ! -L "$BASE_DIR/product" ]; then
-    mv "$BASE_DIR/product" "$BASE_DIR/system/product"
+
+    # only move if target not exists
+    if [ ! -e "$BASE_DIR/system/product" ]; then
+        echo "Moving product -> system/product"
+        mv "$BASE_DIR/product" "$BASE_DIR/system/product"
+    else
+        echo "system/product already exists, skipping move"
+        rm -rf "$BASE_DIR/product"
+    fi
+
+    ln -sfn system/product "$BASE_DIR/product"
 fi
 
-# Move system_ext into /system/system/system_ext
+# SYSTEM_EXT
 if [ -d "$BASE_DIR/system_ext" ] && [ ! -L "$BASE_DIR/system_ext" ]; then
-    mv "$BASE_DIR/system_ext" "$BASE_DIR/system/system_ext"
+
+    # only move if target not exists
+    if [ ! -e "$BASE_DIR/system/system_ext" ]; then
+        echo "Moving system_ext -> system/system_ext"
+        mv "$BASE_DIR/system_ext" "$BASE_DIR/system/system_ext"
+    else
+        echo "system/system_ext already exists, skipping move"
+        rm -rf "$BASE_DIR/system_ext"
+    fi
+
+    ln -sfn system/system_ext "$BASE_DIR/system_ext"
 fi
 
 # Create symlinks
-ln -sf system/product "$BASE_DIR/product"
-ln -sf system/system_ext "$BASE_DIR/system_ext"
+#ln -sf system/product "$BASE_DIR/product"
+#ln -sf system/system_ext "$BASE_DIR/system_ext"
 
 
 echo "Patching started..."

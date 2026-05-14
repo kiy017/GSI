@@ -89,15 +89,11 @@ jobs:
           ls -lh
 
 
-      - name: Upload to GitHub Draft Release (fast uploader)
-        uses: xresloader/upload-to-github-release@main
+      - name: Upload to GoFile
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "Output/*.img*"
-          prerelease: true
-          default_release_name: "GSI Build #${{ github.run_number }}"
-          overwrite: true
-          verbose: true
+          GOFILE_API_KEY: ${{ secrets.GOFILE_API_KEY }}
+        run: |
+          FILE=$(ls Output/*.img* | head -n 1)
+          bash upload.sh "$FILE"
         
           

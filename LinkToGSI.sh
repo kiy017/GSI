@@ -6,13 +6,9 @@ ROM_TYPE=$2
 # =========================
 # PRIVILEGE HELPER (ADD THIS)
 # =========================
-require_root() {
-    if [[ $EUID -ne 0 ]]; then
-        sudo "$@"
-    else
-        "$@"
-    fi
-}
+if [[ "$EUID" -ne 0 ]]; then
+    exec sudo -E bash "$0" "$@"
+fi
 
 partitions="vendor system system_ext product optics prism mi_ext my_bigball my_engineering my_manifest my_region my_carrier my_heytap my_product my_stock"
 

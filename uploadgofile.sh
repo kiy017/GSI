@@ -1,37 +1,26 @@
 #!/bin/bash
 
-FILE="$1"
-
-if [ ! -f "$FILE" ]; then
-  echo "File not found: $FILE"
-  exit 1
+if [[ "$#" == "0" ]]; then
+    echo "ERROR: No file specified!"
+    exit 1
 fi
+
+FILE="$1"
 
 echo "Getting GoFile server..."
 
-RESPONSE=$(curl -s https://api.gofile.io/servers)
-
-# DEBUG kalau error
-echo "$RESPONSE" | head
-
-SERVER=$(echo "$RESPONSE" | jq -r '.data.servers[0].name // empty')
-
-if [ -z "$SERVER" ]; then
-  echo "ERROR: Failed to get GoFile server"
-  exit 1
-fi
+SERVER=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers[0].name')
 
 echo "Using server: $SERVER"
 
-UPLOAD=$(curl -s -F "file=@$FILE" "https://${SERVER}.gofile.io/uploadFile")
+RESPONSE=$(curl -s \
+    -H "Authorization: Bearer $GOFILE_API_KEY" \
+    -F "file=@$FILE" \
+    "https://${SERVER}.gofile.io/uploadFile")
 
-echo "$UPLOAD"
+echo "$RESPONSE"
 
-LINK=$(echo "$UPLOAD" | jq -r '.data.downloadPage // empty')
+LINK=$(echo "$RESPONSE" | jq -r '.data.downloadPage')
 
-if [ -z "$LINK" ]; then
-  echo "Upload failed or invalid response"
-  exit 1
-fi
-
+echo ""
 echo "Download link: $LINK"

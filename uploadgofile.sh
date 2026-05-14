@@ -2,20 +2,36 @@
 
 FILE="$1"
 
-if [[ -z "$FILE" ]]; then
-  echo "No file"
+if [ ! -f "$FILE" ]; then
+  echo "File not found: $FILE"
   exit 1
 fi
 
-if [[ -z "$GOFILE_API_KEY" ]]; then
-  echo "Missing API key"
+echo "Getting GoFile server..."
+
+RESPONSE=$(curl -s https://api.gofile.io/servers)
+
+# DEBUG kalau error
+echo "$RESPONSE" | head
+
+SERVER=$(echo "$RESPONSE" | jq -r '.data.servers[0].name // empty')
+
+if [ -z "$SERVER" ]; then
+  echo "ERROR: Failed to get GoFile server"
   exit 1
 fi
 
-RESPONSE=$(curl -s -X POST "https://api.gofile.io/contents/uploadfile" \
-  -H "Authorization: Bearer $GOFILE_API_KEY" \
-  -F "file=@$FILE")
+echo "Using server: $SERVER"
 
-echo "$RESPONSE" | jq
+UPLOAD=$(curl -s -F "file=@$FILE" "https://${SERVER}.gofile.io/uploadFile")
 
-echo "$RESPONSE" | jq -r '.data.downloadPage'
+echo "$UPLOAD"
+
+LINK=$(echo "$UPLOAD" | jq -r '.data.downloadPage // empty')
+
+if [ -z "$LINK" ]; then
+  echo "Upload failed or invalid response"
+  exit 1
+fi
+
+echo "Download link: $LINK"

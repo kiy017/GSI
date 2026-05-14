@@ -65,10 +65,13 @@ jobs:
             echo "Download Failed."
             exit 1
           fi
-
-      - name: Run LinkToGSI Script
+      - name: Make all scripts executable
         run: |
           find . -type f -name "*.sh" -exec chmod +x {} \;
+          
+      - name: Run LinkToGSI Script
+        run: |
+          chmod +x LinkToGSI.sh
           sudo bash LinkToGSI.sh "$(pwd)/firmware.zip" "${{ inputs.rom_type }}"
 
       - name: Compress GSI (with Fallback)

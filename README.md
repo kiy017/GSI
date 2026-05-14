@@ -29,16 +29,16 @@ pip3 install backports.lzma protobuf twrpdtgen extract-dtb pycryptodome
 ```
 
 ### 3. Run the Script
-Make sure `LinkToGSI.sh` is executable and run it with `sudo`:
+Make sure `LinkToGSI.sh` is executable 
 
 ```bash
 chmod +x LinkToGSI.sh
-sudo bash LinkToGSI.sh <Firmware_URL> <ROM_Type>
+bash LinkToGSI.sh <Firmware_URL> <ROM_Type>
 ```
 
 **Example:**
 ```bash
-sudo bash LinkToGSI.sh https://dl.google.com/dl/android/aosp/lynx-bp1a.zip Pixel
+bash LinkToGSI.sh https://dl.google.com/dl/android/aosp/lynx-bp1a.zip Pixel
 ```
 
 ## ⚠️ Requirements

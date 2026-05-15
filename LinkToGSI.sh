@@ -56,18 +56,33 @@ if [ -z "$2" ]; then
   exit 0
 fi
 
-rm -rf DownloadedROMs
+# Clean unpack only
 rm -rf UnpackedROMs
-
-mkdir -p DownloadedROMs
 mkdir -p UnpackedROMs
 
+# Handle ROM source
 if [ -f "$ROM_LINK" ]; then
-    Tools/Firmware_extractor/extractor.sh "$ROM_LINK" "UnpackedROMs/"
+
+    echo "Using local ROM file:"
+    echo "$ROM_LINK"
+
+    ROM_FILE="$ROM_LINK"
+
 else
-    wget -P "DownloadedROMs/" "$ROM_LINK"
-    Tools/Firmware_extractor/extractor.sh "DownloadedROMs/"* "UnpackedROMs/"
+
+    echo "Downloading ROM..."
+
+    rm -rf DownloadedROMs
+    mkdir -p DownloadedROMs
+
+    wget -O "DownloadedROMs/rom.zip" "$ROM_LINK"
+
+    ROM_FILE="DownloadedROMs/rom.zip"
+
 fi
+
+# Extract firmware
+Tools/Firmware_extractor/extractor.sh "$ROM_FILE" "UnpackedROMs/"
 
 # Extract partitions
 for partition in $partitions; do

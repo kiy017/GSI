@@ -74,7 +74,7 @@ else
 
     
     mkdir -p DownloadedROMs
-    rm -rf DownloadedROMs
+    #rm -rf DownloadedROMs
     mv DownloadedROMs/rom.zip DownloadedROMs/rom_backup.zip
     wget -O "DownloadedROMs/rom.zip" "$ROM_LINK"
 

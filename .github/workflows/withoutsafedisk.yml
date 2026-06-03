@@ -16,6 +16,7 @@ on:
           - MIUIGeneric
           - HyperOS
           - HMD
+          - Generic
 
 jobs:
   Link2GSI:

@@ -19,7 +19,7 @@ usage() {
 supported_roms() {
     echo "Available ROMs:"
     echo ""
-    declare -a versions=(12 12.1 13 14 15 16 17)
+    declare -a versions=(12 12.1 13 14 15)
     for version in "${versions[@]}"; do
         rom_dir="ROMsPatches/$version"
         if [ -d "$rom_dir" ]; then
@@ -48,17 +48,7 @@ fi
 rm -rf "$BASE_DIR"
 mkdir -p "$BASE_DIR"
 echo "Copying to temp directory"
-sudo cp -a "$INPUT_DIR/." "$BASE_DIR/"
-sudo chown -R $USER:$USER "$BASE_DIR"
-echo "===== CHECK ====="
-
-ls -l "$BASE_DIR"
-
-ls -l "$BASE_DIR/system" || true
-
-find "$BASE_DIR" -name build.prop | sort
-#echo "===== BASE STRUCTURE ====="
-#find "$BASE_DIR" -maxdepth 1 | sort
+cp -r "$INPUT_DIR/." "$BASE_DIR/"
 
 SDK_VERSION=$(grep -m1 "ro.build.version.sdk" "$BASE_DIR/system/build.prop" | cut -d '=' -f2 | tr -dc '0-9')
 
@@ -85,7 +75,7 @@ case "$SDK_VERSION" in
     ;;
   36)
     android_version="16"
-    ;;  
+    ;;
   37)
     android_version="17"
     ;;
@@ -108,12 +98,11 @@ if [ ! -d "ROMsPatches/$android_version/$ROM_TYPE" ]; then
   exit 1
 fi
 
-
 echo "Patching started..."
 Patches/$android_version/make.sh "$BASE_DIR"
 Patches/common/make.sh "$BASE_DIR"
 ROMsPatches/$android_version/$ROM_TYPE/make.sh "$BASE_DIR"
-sudo tar -xf "Patches/apex/$android_version.tar.xz" -C "$BASE_DIR/system/apex"
+tar -xf "Patches/apex/$android_version.tar.xz" -C "$BASE_DIR/system/apex"
 
 if [ -n "$(ls -A "$BASE_DIR/vendor" 2>/dev/null)" ]; then
   Tools/vendoroverlay/addvo.sh "$BASE_DIR"
@@ -129,28 +118,11 @@ elif [[ $(grep "ro.build.id" "$BASE_DIR/system/build.prop") ]]; then
 fi
 displayid2=$(echo "$displayid" | sed 's/\./\\./g')
 bdisplay=$(grep "$displayid" "$BASE_DIR/system/build.prop" | sed 's/\./\\./g; s:/:\\/:g; s/\,/\\,/g; s/\ /\\ /g')
-sudo sed -i "s/$bdisplay/$displayid2=Port\.by\.RofikKernel\.Dev/" "$BASE_DIR/system/build.prop"
+sed -i "s/$bdisplay/$displayid2=Builded\.by\.defnotegor\.Using\.FoxetGSITool/" "$BASE_DIR/system/build.prop"
 
 current_date=$(date +"%Y-%m-%d")
 
-#echo "===== FINAL STRUCTURE ====="
-#find "$BASE_DIR" -maxdepth 3 | sort
-
 echo "Create $ROM_TYPE-AB-$android_version-$current_date.img"
-#rm -rf "Output"
+rm -rf "Output"
 mkdir -p "Output"
-sudo Tools/mkimage/mkimage.sh "$BASE_DIR" "Output/system.img"
-
-FINAL_NAME="$ROM_TYPE-AB-$android_version-$current_date-Rofikkernel"
-bash resetpermission.sh
-echo "Compressing image..."
-
-cd Output || exit 1
-sudo chown -R $USER:$USER .
-zip -r9 "${FINAL_NAME}.zip" "system.img"
-
-echo "Done:"
-ls -lh "${FINAL_NAME}.zip"
-
-rm system.img
-
+Tools/mkimage/mkimage.sh "$BASE_DIR" "Output/$ROM_TYPE-AB-$android_version-$current_date-FoxetGSI.img"

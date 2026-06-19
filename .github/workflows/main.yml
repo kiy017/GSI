@@ -96,16 +96,17 @@ jobs:
           echo "Compression step done. Checking files..."
           ls -lh
 
-      - name: Upload to Draft Release
-        uses: softprops/action-gh-release@v2
-        if: always()
-        with:
-          tag_name: draft-${{ github.run_number }}
-          name: Draft Build #${{ github.run_number }}
-          draft: true
-          files: |
-            Output/*.img*
-            Output/*.txt
-            Output/*.log
+      - name: Upload to PixelDrain
+        run: |
+          sudo chown -R $USER:$USER .
+          FILE=$(ls Output/*.img* | head -n 1)
+          echo "Uploading $FILE to PixelDrain..."
+          RESPONSE=$(curl -T "$FILE" https://pixeldrain.com/api/file/)
+          FILE_ID=$(echo $RESPONSE | jq -r '.id')
+          
+          echo "=========================================="
+          echo " Download URL: https://pixeldrain.com/u/$FILE_ID"
+          echo "=========================================="
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
